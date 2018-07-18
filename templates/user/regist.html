@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div id="regist">
+        <!--
+        {% if errors %}
+            <div class="text-danger">
+                {{ errors }}
+            </div>
+        {% endif %}
+
+        -->
+        <div class="text-center"><h3>用户登录</h3></div>
+        <form class="form form-horizontal" action="/user/regist/"
+              method="post"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="col-xs-3 col-md-2" for="name">用户名</label>
+                <div class="col-xs-9 col-md-8">
+                    <input class="form-control" type="text" name="name" placeholder="输入您的用户名">
+                    {% if errors.name %}<span class="text-danger">{{ errors.name }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 col-md-2">口令</label>
+                <div class="col-xs-9 col-md-8">
+                    <input class="form-control" type="password" name="passwd" placeholder="输入您的口令">
+                    {% if errors.passwd %}<span class="text-danger">{{ errors.passwd }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-3 col-md-2">重复口令</label>
+                <div class="col-xs-9 col-md-8">
+                    <input class="form-control" type="password" name="passwd2" placeholder="输入您的口令">
+                    {% if errors.passwd2 %}<span class="text-danger">{{ errors.passwd2 }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 col-md-2">邮箱</label>
+                <div class="col-xs-9 col-md-8">
+                    <input class="form-control" type="email" name="email" placeholder="输入您的邮箱">
+                    {% if errors.email %}<span class="text-danger">{{ errors.email }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 col-md-2">头像</label>
+                <div class="col-xs-9 col-md-8">
+                    <input class="form-control" type="file" name="img">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-3">
+                    <button class="btn btn-primary">注册</button>
+                    <button class="btn btn-link">登录</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+
+    {% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'base/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base/css/bootstrap-theme.min.css' %}">
+
+    {% block css %}
+
+    {% endblock %}
+</head>
+<body>
+<div class="container">
+  <!-- 顶部导航 -->
+  <div id="nav"></div>
+
+  <div>
+  {% block content %}
+
+  {% endblock %}
+  </div>
+  <!-- 底部的内容-->
+  <hr >
+  <div id="footer">
+      <h1>@二手车平台</h1>
+  </div>
+  <script src="{% static 'base/js/jquery.min.js' %}"></script>
+  <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
+</div>
+</body>
+</html>
