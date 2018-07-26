@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div id="art" style="padding: 5px;">
+        <div class="row">
+            <div class="col-xs-7" style='border: 1px solid lightgray'>
+                <ul>
+                    {% for art in arts %}
+                        <li>
+                            <a href="/art/show/{{ art.id }}/">{{ art.title }}</a>
+                            <span class="text-right">{{ art.publish_date|date:'Y-m-d H:i:s' }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-xs-4 col-xs-offset-1" style='border: 1px dotted lightgray'>
+                <h3 class="text-center">阅读排行</h3>
+                <ul class="">
+                    {% for art_, score in topArts %}
+                        <li>{{ art_.title }} --- {{ score }}</li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

@@ -46,6 +46,10 @@ class Art(models.Model):
                             null=True,
                             verbose_name='标签')
 
+    @property
+    def tagName(self):
+        return self.tag.name
+
     class Meta:
         db_table = 't_art'
         verbose_name = '文章'

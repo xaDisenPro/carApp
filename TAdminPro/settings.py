@@ -14,8 +14,11 @@ import os
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from celery.schedules import crontab, timedelta
+from django.middleware.csrf import CsrfViewMiddleware
+from django.middleware.security import SecurityMiddleware
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -32,7 +35,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,6 +49,9 @@ INSTALLED_APPS = [
     'art',
     'DjangoUeditor',
     'user',
+    'djcelery',  # django-celery的app
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
@@ -57,9 +62,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user.helper.log_exec',
 ]
 
-APPEND_SLASH=False
+APPEND_SLASH = False
 
 ROOT_URLCONF = 'TAdminPro.urls'
 
@@ -82,7 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'TAdminPro.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -92,7 +97,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -112,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -125,7 +128,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -142,3 +144,87 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/ups')
 # 配置媒体文件的访问路径(富文本中使用)
 MEDIA_URL = '/static/ups/'
 
+REDIS = {
+    'host': '127.0.0.1',
+    'db': 0,
+    'port': 6379
+}
+
+# ------start celery config--------
+import djcelery
+
+djcelery.setup_loader()  # 装载celery服务
+
+BROKER_URL = 'redis://127.0.0.1:6379/10'  # 配置消息中间件位置
+
+CELERY_TIMEZONE = 'Asia/Shanghai'  # 时区
+
+# 配置计划任务存储的位置
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+# 配置定时任务
+CELERY_IMPORTS = ('art.tasks',)
+CELERYBEAT_SCHEDULE = {
+    u'ReadTask': {
+        'task': 'art.tasks.readArt',
+        'schedule': crontab(minute='*/10'),  # 每2分钟执行一次
+        'args': (1, 8),
+    },
+    u'BuyTask': {
+        'task': 'art.tasks.buyArt',
+        'schedule': timedelta(seconds=60),
+        'args': (1, 5),
+    }
+}
+
+# ----end celery config-----
+
+
+# －－－配置日志－－－－－
+LOGGING = {
+    'version': 1.0,
+    'disable_exists_logger': True,
+    # 日志格式器
+    'formatters': {
+        'info': {
+            'format': '[<%(asctime)s>:%(funcName)s-%(lineno)s]%(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
+    # 处理器:  格式器Formatter
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'formatter': 'info',
+            'class': 'logging.StreamHandler'
+        },
+        'logFile': {
+            'level': 'INFO',
+            'formatter': 'info',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': 'a.log',
+            'encoding': 'utf-8'  # 解决Window的中文乱码
+        }
+    },
+
+    # 日志对象： 处理器Handler
+    'loggers': {
+        'mdjango': {
+            'handlers': ['console', 'logFile'],
+            'level': 'INFO',
+            'propagate': False
+        }
+    }
+}
+
+# -----end logger------
+
+
+# --django-rest-framework----
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':[
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
+# ----end django-rest-framework-----

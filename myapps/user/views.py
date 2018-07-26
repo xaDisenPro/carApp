@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from user.forms import RegistForm
+from user.forms import RegistForm, LoginForm
 
 
 def regist(request):
@@ -25,4 +25,11 @@ def regist(request):
 
 
 def login(request):
-    return HttpResponse('login')
+    if request.method == 'POST':
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            pass
+
+    print(request.datas)
+    login_form = LoginForm()
+    return render(request, 'user/login.html', locals())

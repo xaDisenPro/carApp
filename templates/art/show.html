@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="art_content">
+        <h1>{{ art.title }}</h1>
+        <h3>{{ art.summary }}</h3>
+        <a href="/art/topRead/{{ art.id }}/"
+           class="btn btn-info">抢读</a>
+    </div>
+
+{% endblock %}
